@@ -1,6 +1,7 @@
 import math
 import time
 import sys
+import copy
 
 czasPoczatkowy = 0
 czasKoncowy = 0
@@ -19,18 +20,9 @@ class Node:
         self.value = value
 
 
-class createNode:
-
-    # Constructor to create a new node
-    def __init__(self, data):
-        self.data = data
-        self.left = None
-        self.right = None
-
-
-
 class AVL:
-    mainRoot = 100
+
+    mainRoot = 60
 
     def __init__(self, array):
         global y
@@ -64,25 +56,6 @@ class AVL:
             right = root.right.height
         root.bf = left - right
         return root
-
-
-    def minVal(self):
-        print("min Value:",y[0])
-
-
-    def maxVal(self):
-        print("max Value:",y[-1])
-
-
-    def PathMaxVal(self):
-        # self.__PathMaxVal(self.mainRoot)
-        pass
-    def __PathMaxVal(self,index):
-        pass
-        # if index.right is not None:
-        #     self.__PathMaxVal(index.right)
-        # print(index.value, end=', ')
-
 
     def PathMinVal(self):
         pass
@@ -160,19 +133,34 @@ class AVL:
             if n is not None and n[0].value == value:
                 return n
         return None
+def maxim(n):
+    global root1
+    if n == 0:
+        return maxpath
+    if copyT[n - 1] >= root1:
+        root1 = copyT[n - 1]
+        maxpath.append(copyT[n - 1])
+        return maxim(n - 1)
+    return maxim(n - 1)
+
+
 
 # t = list(map(int, input().split()))
-t = [100,80,90,70,30,40,50,60,20,30,40,200,400,1]
+t = [60,70,50,80,61,51,49,90,71,48,100]
+root1 = 3
+copyT = copy.deepcopy(t)
+copyT.reverse()
+
+n = len(copyT)
+maxpath = []
+
+
 
 root = AVL(t)
 root.PreOrder()
 root.Inorder()
 root.PostOrderDelete()
-root.minVal()
-root.maxVal()
-root.PathMaxVal()
-root.PathMinVal()
-
+print("Sciezka Max:" , maxim(n))
 
 
 
