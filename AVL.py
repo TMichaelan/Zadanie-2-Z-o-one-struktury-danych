@@ -14,16 +14,30 @@ class Node:
         self.right = right
         self.bf = 0
 
+
     def SetValue(self, value):
         self.value = value
 
 
+class createNode:
+
+    # Constructor to create a new node
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+
+
 class AVL:
-    mainRoot = 0
+    mainRoot = 100
 
     def __init__(self, array):
+        global y
         y = sorted(array)
         self.mainRoot = self.Create(y, None)
+
+
 
     def Create(self, array, parent):
         if not array:
@@ -51,17 +65,42 @@ class AVL:
         root.bf = left - right
         return root
 
+
+    def minVal(self):
+        print("min Value:",y[0])
+
+
+    def maxVal(self):
+        print("max Value:",y[-1])
+
+
+    def PathMaxVal(self):
+        # self.__PathMaxVal(self.mainRoot)
+        pass
+    def __PathMaxVal(self,index):
+        pass
+        # if index.right is not None:
+        #     self.__PathMaxVal(index.right)
+        # print(index.value, end=', ')
+
+
+    def PathMinVal(self):
+        pass
+
+    def __PathMinVal(self):
+        pass
+
     def __Inorder(self, index):
         if index.left is not None:
             self.__Inorder(index.left)
-        print(index.value, end=' ')
+        print(index.value,end=', ')
         if index.right is not None:
             self.__Inorder(index.right)
 
     def Inorder(self):
         print("In-order: [", end='')
         self.__Inorder(self.mainRoot)
-        print("]")
+        print("\b\b]")
 
     def PreOrder(self, beginning=None):
         if self.mainRoot is None:
@@ -123,11 +162,17 @@ class AVL:
         return None
 
 # t = list(map(int, input().split()))
-t = [100,80,90,70,30,40,50,60]
+t = [100,80,90,70,30,40,50,60,20,30,40,200,400,1]
+
 root = AVL(t)
 root.PreOrder()
 root.Inorder()
 root.PostOrderDelete()
+root.minVal()
+root.maxVal()
+root.PathMaxVal()
+root.PathMinVal()
+
 
 
 
