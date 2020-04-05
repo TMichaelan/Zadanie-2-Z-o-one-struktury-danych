@@ -51,6 +51,18 @@ class AVL:
         root.bf = left - right
         return root
 
+    def __Inorder(self, index):
+        if index.left is not None:
+            self.__Inorder(index.left)
+        print(index.value, end=' ')
+        if index.right is not None:
+            self.__Inorder(index.right)
+
+    def Inorder(self):
+        print("In-order: [", end='')
+        self.__Inorder(self.mainRoot)
+        print("]")
+
     def PreOrder(self, beginning=None):
         if self.mainRoot is None:
             print("Drzewo nie istnieje.")
@@ -109,6 +121,13 @@ class AVL:
             if n is not None and n[0].value == value:
                 return n
         return None
+
+# t = list(map(int, input().split()))
+t = [100,80,90,70,30,40,50,60]
+root = AVL(t)
+root.PreOrder()
+root.Inorder()
+root.PostOrderDelete()
 
 
 
