@@ -1,13 +1,10 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
 #include <queue>
 #include <string>
 #include <sstream>
-#include <exception>
 #include <algorithm>
 #include <ctime>
-#include <thread>
 #include <fstream>
 
 struct Node;
@@ -15,10 +12,9 @@ Node* AVL(std::vector<unsigned int> tablica, int a, int b);
 Node* BST(std::vector<unsigned int> tablica);
 void PreOrder(Node* root);
 void InOrder(Node* root);
-Node* PostOrderDelete(Node* root);
+Node* PostOrderDelete(Node* root, bool path=true);
 Node* Find(Node* root, unsigned int value);
 Node* Delete(Node* root, unsigned int value);
-Node* RecursiveDelete(Node* toDelete);
 Node* GetMax(Node* root, bool path=true);
 Node* GetMin(Node* root, bool path=true);
 Node* Insert(Node* root, unsigned int value);
@@ -85,14 +81,14 @@ int main(int argc, char* argv[])
                 std::clock_t timestart = std::clock();
                 mainRoot = AVL(tablicaWejsciowa, 0, tablicaWejsciowa.size() - 1);
                 std::clock_t timeend = std::clock();
-                std::cout << "Czas tworzenia drzewa AVL: " << (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
+                std::cout << "Czas tworzenia drzewa AVL: " << 1000.0 * (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
             }
             else
             {
                 std::clock_t timestart = std::clock();
                 mainRoot = BST(tablicaWejsciowa);
                 std::clock_t timeend = std::clock();
-                std::cout << "Czas tworzenia drzewa BST: " << (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
+                std::cout << "Czas tworzenia drzewa BST: " << 1000.0 * (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
             }
             Menu(mainRoot);
         }
@@ -110,9 +106,10 @@ void Menu(Node* root)
     Node* temp = NULL;
     std::clock_t timestart;
     std::clock_t timeend;
+    std::cout << "Instrukcja:\n1- Wyswietlenie wartosci maksymalnej i minimalnej.\n2- Usuniecie kluczy.\n3- Wypisanie elementow drzewa (In-Order).\n4- Wypisanie elementow drzewa (Pre-Order).\n5- Usuniecie drzewa.\n6- Wypisanie podrzewa.\n7- Rownowazenie drzewa.\n8- Wyjscie.\n";
     do
     {
-        zapytanie = GetNumber("Wybierz operacje:\n1- Wyswietlenie wartosci maksymalnej i minimalnej.\n2- Usuniecie kluczy.\n3- Wypisanie elementow drzewa (In-Order).\n4- Wypisanie elementow drzewa (Pre-Order).\n5- Usuniecie drzewa.\n6- Wypisanie podrzewa.\n7- Rownowazenie drzewa.\n8- Wyjscie.\n", 8);
+        zapytanie = GetNumber("Wybierz operacje: ", 8);
         switch(zapytanie)
         {
         case 1:
@@ -120,7 +117,7 @@ void Menu(Node* root)
             timestart = std::clock();
             GetMin(root);
             timeend = std::clock();
-            std::cout << "\b] Czas trwania: " << (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
+            std::cout << "\b] Czas trwania: " << 1000.0 * (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
             std::cout << "Sciezka do wartosci maksymalnej: [";
             GetMax(root);
             std::cout << "\b]\n";
@@ -133,19 +130,19 @@ void Menu(Node* root)
             }
             break;
         case 3:
-            std::cout << "[";
+            std::cout << "InOrder: [";
             timestart = std::clock();
             InOrder(root);
             timeend = std::clock();
-            std::cout << "\b] Czas trwania: " << (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
+            std::cout << "\b] Czas trwania: " << 1000.0 * (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
             break;
         case 4:
-            std::cout << "[";
+            std::cout << "PreOrder: [";
             PreOrder(root);
             std::cout << "\b]\n";
             break;
         case 5:
-            std::cout << "[";
+            std::cout << "Usuwane elementy: [";
             root = PostOrderDelete(root);
             std::cout << "\b]\n";
             break;
@@ -153,16 +150,18 @@ void Menu(Node* root)
             temp = Find(root, GetNumber("Podaj klucz: ", 4294967295));
             if (temp != NULL)
             {
-                std::cout << "[";
+                std::cout << "PreOrder: [";
                 PreOrder(temp);
                 std::cout << "\b]\n";
             }
+            else
+                std::cout << "Element nie istnieje.\n";
             break;
         case 7:
             timestart = std::clock();
             BFSBalance(root);
             timeend = std::clock();
-            std::cout << "Czas trwania: " << (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
+            std::cout << "Czas trwania: " << 1000.0 * (timeend - timestart) / CLOCKS_PER_SEC << "ms.\n";
             break;
         case 8:
             break;
@@ -170,7 +169,7 @@ void Menu(Node* root)
             std::cout << "Zle zapytanie.\n";
         }
     }while (zapytanie != 8);
-    PostOrderDelete(root);
+    PostOrderDelete(root, false);
 }
 
 unsigned int GetNumber(std::string informacja, unsigned int limit)
@@ -237,7 +236,7 @@ struct Node
 
 void BFSBalance(Node* root)
 {
-    if (!root)
+    if (root == NULL)
     {
         std::cout << "Drzewo nie istnieje.\n";
         return;
@@ -278,7 +277,7 @@ Node* AVL(std::vector<unsigned int> tablica, int a, int b)
     else if (root->left != NULL && root->right == NULL)
         root->height = root->left->height + 1;
     else
-        root->height = std::max(root->left->height, root->right->height) + 1;
+        root->height = (root->left->height > root->right->height ? root->left->height : root->right->height) + 1;
     return root;
 }
 
@@ -295,7 +294,7 @@ Node* BST(std::vector<unsigned int> tablica)
 
 void PreOrder(Node* root)
 {
-    if (!root)
+    if (root == NULL)
     {
         std::cout << "Drzewo nie istnieje.";
         return;
@@ -314,7 +313,7 @@ void PreOrder(Node* root)
 
 void InOrder(Node* root)
 {
-    if (!root)
+    if (root == NULL)
     {
         std::cout << "Drzewo nie istnieje.";
         return;
@@ -326,25 +325,27 @@ void InOrder(Node* root)
         InOrder(root->right);
 }
 
-Node* PostOrderDelete(Node* root)
+Node* PostOrderDelete(Node* root, bool path)
 {
-    if (!root)
+    if (root == NULL)
     {
-        std::cout << "Drzewo nie istnieje.";
+        if (path)
+            std::cout << "Drzewo nie istnieje.";
         return NULL;
     }
     if (root->left != NULL)
-        root->left = PostOrderDelete(root->left);
+        root->left = PostOrderDelete(root->left, path);
     if (root->right != NULL)
-        root->right = PostOrderDelete(root->right);
-    std::cout << root->value << " ";
+        root->right = PostOrderDelete(root->right, path);
+    if (path)
+        std::cout << root->value << " ";
     free(root);
     return NULL;
 }
 
 Node* Find(Node* root, unsigned int value)
 {
-    if (!root)
+    if (root == NULL)
     {
         std::cout << "Drzewo nie istnieje.\n";
         return NULL;
@@ -368,7 +369,7 @@ Node* Find(Node* root, unsigned int value)
 
 Node* Delete(Node* root, unsigned int value)
 {
-    if (!root)
+    if (root == NULL)
     {
         std::cout << "Drzewo nie istnieje.\n";
         return NULL;
@@ -407,35 +408,32 @@ Node* Delete(Node* root, unsigned int value)
             free(root);
             return NULL;
         }
-        else
+        else if (root->left != NULL && root->right != NULL)
         {
-            if (root->left != NULL && root->right != NULL)
-            {
-                if (root->left->height > root->right->height)
-                {
-                    Node* tmp = GetMax(root->left, false);
-                    root->value = tmp->value;
-                    root->left = Delete(root->left, tmp->value);
-                }
-                else
-                {
-                    Node* tmp = GetMin(root->right, false);
-                    root->value = tmp->value;
-                    root->right = Delete(root->right, tmp->value);
-                }
-            }
-            else if (root->left != NULL)
+            if (root->left->height > root->right->height)
             {
                 Node* tmp = GetMax(root->left, false);
                 root->value = tmp->value;
                 root->left = Delete(root->left, tmp->value);
             }
-            else if (root->right != NULL)
+            else
             {
                 Node* tmp = GetMin(root->right, false);
                 root->value = tmp->value;
                 root->right = Delete(root->right, tmp->value);
             }
+        }
+        else if (root->left != NULL)
+        {
+            Node* tmp = GetMax(root->left, false);
+            root->value = tmp->value;
+            root->left = Delete(root->left, tmp->value);
+        }
+        else
+        {
+            Node* tmp = GetMin(root->right, false);
+            root->value = tmp->value;
+            root->right = Delete(root->right, tmp->value);
         }
     }
     if (root->left == NULL && root->right == NULL)
@@ -445,36 +443,46 @@ Node* Delete(Node* root, unsigned int value)
     else if (root->left != NULL && root->right == NULL)
         root->height = root->left->height + 1;
     else
-        root->height = std::max(root->left->height, root->right->height) + 1;
+        root->height = (root->left->height > root->right->height ? root->left->height : root->right->height) + 1;
     return root;
 }
 
 Node* GetMax(Node* root, bool path)
 {
-    if (!root)
+    if (root == NULL)
     {
         std::cout << "Drzewo nie istnieje.";
         return NULL;
     }
+    Node* x = root;
+    while (x->right != NULL)
+    {
+        if (path)
+            std::cout << x->value << " ";
+        x = x->right;
+    }
     if (path)
-        std::cout << root->value << " ";
-    if (root->right != NULL)
-        return GetMax(root->right, path);
-    return root;
+        std::cout << x->value << " ";
+    return x;
 }
 
 Node* GetMin(Node* root, bool path)
 {
-    if (!root)
+    if (root == NULL)
     {
         std::cout << "Drzewo nie istnieje.";
         return NULL;
     }
+    Node* x = root;
+    while (x->left != NULL)
+    {
+        if (path)
+            std::cout << x->value << " ";
+        x = x->left;
+    }
     if (path)
-        std::cout << root->value << " ";
-    if (root->left != NULL)
-        return GetMin(root->left, path);
-    return root;
+        std::cout << x->value << " ";
+    return x;
 }
 
 Node* Insert(Node* root, unsigned int value)
